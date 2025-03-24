@@ -4,6 +4,9 @@ A Chrome extension for WhatsApp Web that captures voice notes, identifies mentio
 ## Architecture
 ![image](https://github.com/user-attachments/assets/75993dad-3e4b-47be-9ba8-e3d898468186)
 
+## Demo 
+https://github.com/that-coding-kid/Voice-Tag-WP/blob/main/assets/Extension_Test2.mp4
+
 ## Features
 
 - Records and processes voice notes sent through WhatsApp Web
