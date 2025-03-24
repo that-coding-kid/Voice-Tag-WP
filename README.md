@@ -4,18 +4,16 @@ A Chrome extension for WhatsApp Web that captures voice notes, identifies mentio
 ## Architecture
 ![image](https://github.com/user-attachments/assets/75993dad-3e4b-47be-9ba8-e3d898468186)
 
-## Demo 
-https://github.com/that-coding-kid/Voice-Tag-WP/blob/main/assets/Extension_Test2.mp4
+## Demo
+Check the assets folder.
 
 ## Features
-
 - Records and processes voice notes sent through WhatsApp Web
 - Uses speech recognition to transcribe audio
 - Identifies the addressee/recipient mentioned in the voice note
 - Automatically tags the identified person in the chat
 
 ## How It Works
-
 1. When you record a voice note in WhatsApp Web, the extension captures the audio in real-time
 2. When you send the voice note, the audio is processed to:
    - Transcribe the speech to text
@@ -35,11 +33,9 @@ https://github.com/that-coding-kid/Voice-Tag-WP/blob/main/assets/Extension_Test2
 ### Server Setup
 
 The extension requires a server component to process the audio. You can:
-
-1. Use the hosted server at `https://workspace.b1c8560a-0313-4f27-ae11-8f4605e9037d.replit.dev`
-2. Run the server locally:
+Run the server locally:
    ```bash
-   python simple_server.py
+   python main.py
    ```
    And set the Server URL in the extension popup to `http://localhost:5000`
 
