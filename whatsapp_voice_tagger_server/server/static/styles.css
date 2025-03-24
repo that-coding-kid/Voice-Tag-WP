@@ -1,0 +1,63 @@
+/* Styles for WhatsApp Voice Tagger extension */
+
+body {
+  min-width: 320px;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.card {
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.form-switch .form-check-input {
+  cursor: pointer;
+}
+
+.form-control:focus {
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+#status {
+  transition: opacity 0.3s ease-in-out;
+}
+
+.text-muted {
+  font-size: 0.875rem;
+}
+
+ol {
+  font-size: 0.875rem;
+}
+
+.container {
+  max-width: 800px;
+}
+
+.app-logo {
+  max-width: 80px;
+  margin-bottom: 15px;
+}
+
+.alert {
+  margin-top: 20px;
+}
+
+.code-block {
+  background-color: #282c34;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  color: #abb2bf;
+  overflow-x: auto;
+}
+
+@media (max-width: 576px) {
+  body {
+    padding: 10px;
+  }
+}

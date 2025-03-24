@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhatsApp Voice Tagger Server</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/static/styles.css" rel="stylesheet">
+</head>
+<body data-bs-theme="dark">
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="card bg-dark shadow">
+          <div class="card-body text-center">
+            <div class="mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 128 128" fill="none" class="mb-3">
+                <rect width="128" height="128" rx="20" fill="#25D366"/>
+                <path d="M64 24C43.2 24 24 43.2 24 64C24 75.12 28.4 85.44 35.68 93.12L28 104L39.52 99.76C46.88 104.64 55.12 108 64 108C84.8 108 104 88.8 104 68C104 47.2 84.8 24 64 24ZM85.04 82.24C83.28 86.64 77.52 90.32 72.64 91.04C69.44 91.52 65.28 91.76 53.28 86.88C38.16 80.8 28.8 65.44 28 64.32C27.28 63.2 22 56.24 22 49.04C22 41.84 25.68 38.32 27.2 36.72C28.48 35.44 30.32 34.88 32.08 34.88C32.72 34.88 33.36 34.88 33.92 34.96C35.44 34.96 36.24 35.04 37.28 37.28C38.56 40.08 41.36 47.28 41.36 47.92C41.36 48.56 41.36 49.2 40.72 49.84C40.08 50.48 39.44 51.36 38.8 52C38.16 52.64 37.44 53.36 38.24 54.64C39.04 55.92 41.36 59.68 44.72 62.72C49.04 66.56 52.64 67.84 54.16 68.48C55.68 69.12 56.32 68.8 57.12 67.84C57.92 66.88 60.16 64.16 61.12 62.64C62.08 61.12 63.04 61.44 64.24 61.92C65.44 62.4 72.64 66 73.92 66.64C75.2 67.28 76 67.6 76.16 68.24C76.48 69.12 76.48 71.52 74.72 74.4" fill="white"/>
+                <circle cx="92" cy="36" r="20" fill="#FF5252"/>
+                <path d="M86 36C86 35.4477 86.4477 35 87 35H97C97.5523 35 98 35.4477 98 36C98 36.5523 97.5523 37 97 37H87C86.4477 37 86 36.5523 86 36Z" fill="white"/>
+              </svg>
+              <h1 class="h3">WhatsApp Voice Tagger Server</h1>
+              <p class="text-muted">Status: <span id="serverStatus" class="badge bg-success">Running</span></p>
+            </div>
+            
+            <div id="modelStatus" class="alert alert-info">
+              <div class="spinner-border spinner-border-sm text-light me-2" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              Checking model status...
+            </div>
+            
+            <div class="card bg-dark-subtle mb-4">
+              <div class="card-header">Server Information</div>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item bg-dark-subtle d-flex justify-content-between">
+                  <span>Server URL:</span>
+                  <code>http://localhost:5000</code>
+                </li>
+                <li class="list-group-item bg-dark-subtle d-flex justify-content-between">
+                  <span>API Endpoint:</span>
+                  <code>/process_audio</code>
+                </li>
+                <li class="list-group-item bg-dark-subtle d-flex justify-content-between">
+                  <span>Status Endpoint:</span>
+                  <code>/status</code>
+                </li>
+              </ul>
+            </div>
+            
+            <div class="card bg-dark-subtle">
+              <div class="card-header">How to Use</div>
+              <div class="card-body">
+                <ol class="text-start">
+                  <li>Install the WhatsApp Voice Tagger browser extension</li>
+                  <li>Configure the extension to use this server URL</li>
+                  <li>Open WhatsApp Web in your browser</li>
+                  <li>Record a voice note mentioning someone</li>
+                  <li>After sending, the person will be automatically tagged</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Check server status periodically
+    function checkStatus() {
+      fetch('/status')
+        .then(response => response.json())
+        .then(data => {
+          const modelStatusEl = document.getElementById('modelStatus');
+          const serverStatusEl = document.getElementById('serverStatus');
+          
+          serverStatusEl.className = 'badge bg-success';
+          serverStatusEl.textContent = 'Running';
+          
+          if (data.models_initialized) {
+            modelStatusEl.className = 'alert alert-success';
+            modelStatusEl.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill me-2" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg> Models are loaded and ready to use';
+          } else {
+            // Handle different initialization statuses
+            if (data.initialization_status === "in_progress") {
+              modelStatusEl.className = 'alert alert-warning';
+              modelStatusEl.innerHTML = 
+                '<div class="spinner-border spinner-border-sm text-light me-2" role="status">' +
+                '<span class="visually-hidden">Loading...</span>' +
+                '</div>' +
+                (data.message || 'Models are being initialized, this may take a few minutes...');
+            } else {
+              modelStatusEl.className = 'alert alert-warning';
+              modelStatusEl.innerHTML = 
+                '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-triangle-fill me-2" viewBox="0 0 16 16"><path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/></svg>' +
+                (data.message || 'Models initialization pending. The server will be ready soon.');
+            }
+            
+            // Check again in 5 seconds
+            setTimeout(checkStatus, 5000);
+          }
+        })
+        .catch(error => {
+          document.getElementById('serverStatus').className = 'badge bg-danger';
+          document.getElementById('serverStatus').textContent = 'Error';
+          
+          const modelStatusEl = document.getElementById('modelStatus');
+          modelStatusEl.className = 'alert alert-danger';
+          modelStatusEl.textContent = 'Error connecting to server: ' + error.message;
+        });
+    }
+    
+    // Check status when page loads
+    document.addEventListener('DOMContentLoaded', checkStatus);
+  </script>
+</body>
+</html>

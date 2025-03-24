@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhatsApp Voice Tagger</title>
+  <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+</head>
+<body data-bs-theme="dark">
+  <div class="container py-3">
+    <div class="text-center mb-4">
+      <h1 class="h4">WhatsApp Voice Tagger</h1>
+      <p class="text-muted">Automatically tags people mentioned in voice notes</p>
+    </div>
+    
+    <div class="card bg-dark mb-3">
+      <div class="card-body">
+        <div class="form-check form-switch mb-3">
+          <input class="form-check-input" type="checkbox" id="enableExtension" checked>
+          <label class="form-check-label" for="enableExtension">Enable extension</label>
+        </div>
+        
+        <div class="mb-3">
+          <label for="serverUrl" class="form-label">Server URL</label>
+          <input type="text" class="form-control" id="serverUrl" value="https://workspace.b1c8560a-0313-4f27-ae11-8f4605e9037d.replit.dev">
+        </div>
+        
+        <button class="btn btn-primary w-100" id="saveSettings">Save Settings</button>
+      </div>
+    </div>
+    
+    <div class="card bg-dark mb-3">
+      <div class="card-header">Instructions</div>
+      <div class="card-body">
+        <ol class="ps-3 mb-0">
+          <li>Open WhatsApp Web</li>
+          <li>Record a voice note mentioning someone</li>
+          <li>Send the voice note</li>
+          <li>The extension will automatically tag the person mentioned</li>
+        </ol>
+      </div>
+    </div>
+    
+    <div id="status" class="alert alert-success d-none"></div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
