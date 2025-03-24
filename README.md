@@ -1,6 +1,20 @@
 # WhatsApp Voice Tagger Chrome Extension
 
 A Chrome extension for WhatsApp Web that captures voice notes, identifies mentioned names, and automatically tags those people in the chat.
+## Architecture
+Audio Transcription and WhatsApp Integration Process
+Detect Voice Recording
+Transcribe Audio with Whisper
+Inject Mention in WhatsApp
+Monitor WhatsApp mic button for recording start and stop
+Use Whisper to transcribe the recorded audio
+Append @contact_name in WhatsApp's input field
+Capture and Process Audio
+Identify Person with NER
+Automate Model Downloads
+Record audio while speaking and process it
+Process text to extract named entities and identify contacts
+Ensure necessary models are downloaded before use![image](https://github.com/user-attachments/assets/75993dad-3e4b-47be-9ba8-e3d898468186)
 
 ## Features
 
