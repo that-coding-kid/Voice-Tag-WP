@@ -179,75 +179,22 @@ function addManualControls() {
   }
   
   // Create a floating control panel
-  const controlPanel = document.createElement('div');
-  controlPanel.id = 'voice-tagger-controls';
-  controlPanel.style.position = 'fixed';
-  controlPanel.style.bottom = '100px';
-  controlPanel.style.right = '20px';
-  controlPanel.style.zIndex = '9999';
-  controlPanel.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-  controlPanel.style.padding = '10px';
-  controlPanel.style.borderRadius = '5px';
-  controlPanel.style.color = 'white';
+  
   
   // Add manual stop button
-  const stopButton = document.createElement('button');
-  stopButton.textContent = 'Stop Recording';
-  stopButton.style.padding = '5px 10px';
-  stopButton.style.marginRight = '5px';
-  stopButton.style.cursor = 'pointer';
-  stopButton.onclick = () => {
-    console.log("Manual stop button clicked");
-    manualStopRequested = true;
-    if (isRecording) {
-      stopRecording(true);
-    }
-  };
+  
   
   // Add manual process button
-  const processButton = document.createElement('button');
-  processButton.textContent = 'Process Audio';
-  processButton.style.padding = '5px 10px';
-  processButton.style.cursor = 'pointer';
-  processButton.onclick = () => {
-    console.log("Manual process button clicked");
-    if (audioChunks.length > 0) {
-      processRecordedAudio();
-    } else {
-      showNotification("No audio data to process", "warning");
-    }
-  };
+  
   
   // Add status indicator
-  const statusIndicator = document.createElement('div');
-  statusIndicator.id = 'voice-tagger-status';
-  statusIndicator.style.marginTop = '5px';
-  statusIndicator.style.fontSize = '12px';
-  statusIndicator.textContent = 'Ready';
+  
   
   // Update status indicator periodically
-  setInterval(() => {
-    const statusEl = document.getElementById('voice-tagger-status');
-    if (statusEl) {
-      if (isRecording) {
-        const duration = Math.floor((Date.now() - recordingStartTime) / 1000);
-        statusEl.textContent = `Recording: ${duration}s`;
-        statusEl.style.color = '#ff4444';
-      } else if (audioChunks.length > 0) {
-        statusEl.textContent = `Audio ready: ${audioChunks.length} chunks`;
-        statusEl.style.color = '#44ff44';
-      } else {
-        statusEl.textContent = 'Ready';
-        statusEl.style.color = 'white';
-      }
-    }
-  }, 1000);
+  
   
   // Assemble and add to page
-  controlPanel.appendChild(stopButton);
-  controlPanel.appendChild(processButton);
-  controlPanel.appendChild(statusIndicator);
-  document.body.appendChild(controlPanel);
+  
 }
 
 async function startRecording() {
@@ -583,127 +530,150 @@ function tagAddresseeInChat(addressee, transcription = '') {
   console.log(`Matched contact: ${matchedContact}`);
   showNotification(`Tagging: ${matchedContact}`, "success");
   
-  // Prepare the message text
-  let message = `@${matchedContact} Voice note for you`;
-  
-  // Use clipboard API to insert text - this is more reliable
-  navigator.clipboard.writeText(message).then(() => {
+  try {
     // Find the chat input
-    const chatInput = document.querySelector(WHATSAPP_SELECTORS.CHAT_INPUT);
-    if (chatInput) {
-      // Focus the input field
-      chatInput.focus();
-      
-      // Simulate a delay as if the user is pasting text
-      setTimeout(() => {
-        try {
-          // For lexical editor, try to find paragraph first
-          const paragraph = document.querySelector("div[contenteditable='true'][data-tab='10']");
-          if (paragraph) {
-            // Focus the paragraph but don't insert text yet
-            paragraph.focus();
-            
-            // Use execCommand only once to paste text
-            document.execCommand("insertText", false, message);
-            console.log("Message inserted into chat input");
-            
-            // Try to send the message after a delay
-            setTimeout(() => {
-              console.log("Attempting to send message");
-              
-              // Find the send button by the most reliable selector
-              let sendButton = document.querySelector('span[data-icon="send"]');
-              
-              // If not found, try the alternative selector
-              if (!sendButton) {
-                sendButton = document.querySelector('button[aria-label="Send"]');
-              }
-              
-              if (sendButton) {
-                console.log("Found send button, clicking it");
-                
-                // Create and dispatch a mouse click event
-                const clickEvent = new MouseEvent('click', {
-                  bubbles: true,
-                  cancelable: true,
-                  view: window,
-                  // Make this look like a real click
-                  detail: 1,
-                  screenX: 0,
-                  screenY: 0,
-                  clientX: 0,
-                  clientY: 0
-                });
-                
-                // Only dispatch the event once
-                sendButton.dispatchEvent(clickEvent);
-                console.log("Send button click event dispatched");
-                
-                // Show success notification
-                showNotification("Message sent", "success");
-              } else {
-                console.warn("Send button not found");
-                showNotification("Send button not found - please send manually", "warning");
-              }
-              
-              // Reset the flag after everything is done
-              window._isTaggingAddresseeInProgress = false;
-            }, 1000); // 1 second delay before sending
-          } else {
-            console.error("Paragraph element not found");
-            showNotification("Chat input element not found", "error");
-            window._isTaggingAddresseeInProgress = false;
-          }
-        } catch (err) {
-          console.error('Text insertion error:', err);
-          showNotification("Error inserting text - please paste manually", "error");
-          window._isTaggingAddresseeInProgress = false;
-        }
-      }, 1000); // Reduced delay before pasting text
-    } else {
+    const chatInput = document.querySelector("div[contenteditable='true'][data-tab='10']");;
+    if (!chatInput) {
       console.error("Chat input not found");
       showNotification("Could not find chat input", "error");
       window._isTaggingAddresseeInProgress = false;
+      return;
     }
-  }).catch(err => {
-    console.error('Failed to copy text: ', err);
-    showNotification("Error: Couldn't prepare message", "error");
+    
+    // Focus the input field
+    chatInput.focus();
+    
+    // Use WhatsApp's native mention system instead of text paste
+    setTimeout(() => {
+      try {
+        // First, type the @ symbol to trigger WhatsApp's mention UI
+        document.execCommand("insertText", false, "@");
+        console.log("@ symbol inserted to trigger mention UI");
+        
+        // Wait a moment for the mention UI to appear
+        setTimeout(() => {
+          // Now type the contact name
+          document.execCommand("insertText", false, matchedContact);
+          console.log("Contact name inserted");
+          
+          // Wait a moment for WhatsApp to process the name
+          setTimeout(() => {
+            // Press Tab or Enter to select the contact from suggestion
+            const tabEvent = new KeyboardEvent('keydown', {
+              key: 'Tab',
+              code: 'Tab',
+              keyCode: 9,
+              which: 9,
+              bubbles: true,
+              cancelable: true
+            });
+            chatInput.dispatchEvent(tabEvent);
+            console.log("Tab key pressed to select mention");
+            
+            // Wait a bit, then add the rest of the message
+            setTimeout(() => {
+              document.execCommand("insertText", false, " Voice note for you");
+              console.log("Rest of message inserted");
+              
+              // Finally, send the message
+              setTimeout(() => {
+                // Find the send button
+                let sendButton = document.querySelector('span[data-icon="send"]');
+                if (!sendButton) {
+                  sendButton = document.querySelector('button[aria-label="Send"]');
+                }
+                
+                if (sendButton) {
+                  console.log("Found send button, clicking it");
+                  
+                  // Click the send button
+                  sendButton.click();
+                  console.log("Send button clicked");
+                  
+                  // Show success notification
+                  showNotification("Message sent", "success");
+                } else {
+                  // Try pressing Enter as a fallback
+                  const enterEvent = new KeyboardEvent('keydown', {
+                    key: 'Enter',
+                    code: 'Enter',
+                    keyCode: 13,
+                    which: 13,
+                    bubbles: true,
+                    cancelable: true
+                  });
+                  chatInput.dispatchEvent(enterEvent);
+                  console.log("Enter key pressed as fallback");
+                  showNotification("Used Enter key to send (send button not found)", "info");
+                }
+                
+                // Reset the flag
+                window._isTaggingAddresseeInProgress = false;
+              }, 500); // 500ms delay before sending
+            }, 300); // 300ms delay before adding rest of message
+          }, 300); // 300ms delay before pressing Tab
+        }, 300); // 300ms delay before typing contact name
+      } catch (err) {
+        console.error('Error during tagging process:', err);
+        showNotification("Error during tagging process", "error");
+        window._isTaggingAddresseeInProgress = false;
+      }
+    }, 500); // 500ms initial delay
+  } catch (err) {
+    console.error('General error in tagging function:', err);
+    showNotification("Error tagging contact", "error");
     window._isTaggingAddresseeInProgress = false;
-  });
+  }
 }
+
 function findBestMatchingContact(addressee) {
   if (!contacts.length) {
     return null;
   }
-  
-  // Simple matching algorithm
-  // This could be improved with more sophisticated string matching
+
   const normalizedAddressee = addressee.toLowerCase();
   let bestMatch = null;
   let highestScore = 0;
-  
+
   for (const contact of contacts) {
     const contactName = contact.name.toLowerCase();
-    
-    // Exact match
-    if (contactName === normalizedAddressee) {
-      return contact.name;
+    const score = 1 - levenshteinDistance(normalizedAddressee, contactName) / Math.max(normalizedAddressee.length, contactName.length);
+
+    if (score > highestScore) {
+      highestScore = score;
+      bestMatch = contact.name;
     }
-    
-    // Check if addressee contains contact name or vice versa
-    if (contactName.includes(normalizedAddressee) || normalizedAddressee.includes(contactName)) {
-      const score = Math.min(contactName.length, normalizedAddressee.length) / 
-                   Math.max(contactName.length, normalizedAddressee.length);
-      if (score > highestScore) {
-        highestScore = score;
-        bestMatch = contact.name;
+  }
+  console.log(highestScore);
+
+  return highestScore > 0.6 ? bestMatch : null;
+}
+
+function levenshteinDistance(str1, str2) {
+  const m = str1.length;
+  const n = str2.length;
+  const dp = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0));
+
+  for (let i = 0; i <= m; i++) {
+    dp[i][0] = i;
+  }
+  for (let j = 0; j <= n; j++) {
+    dp[0][j] = j;
+  }
+
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      if (str1[i - 1] === str2[j - 1]) {
+        dp[i][j] = dp[i - 1][j - 1];
+      } else {
+        dp[i][j] = Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]) + 1;
       }
     }
   }
-  
-  // Return best match if score is above threshold
-  return highestScore > 0.5 ? bestMatch : null;
+
+  return dp[m][n];
 }
+
 
 // Initialize when page is fully loaded
 if (document.readyState === 'complete') {

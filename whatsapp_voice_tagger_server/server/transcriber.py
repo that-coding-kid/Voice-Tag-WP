@@ -49,7 +49,7 @@ class WhisperTranscriber:
                 raise FileNotFoundError(f"Audio file not found: {audio_path}")
             
             # Transcribe the audio
-            result = self.model.transcribe(audio_path)
+            result = self.model.transcribe(audio_path, language = "en")
             transcription = result["text"].strip()
             
             logger.info(f"Transcription completed successfully")
